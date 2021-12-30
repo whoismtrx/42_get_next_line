@@ -6,114 +6,91 @@
 /*   By: orekabe <orekabe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/29 15:00:58 by orekabe           #+#    #+#             */
-/*   Updated: 2021/12/29 22:51:53 by orekabe          ###   ########.fr       */
+/*   Updated: 2021/12/30 17:03:22 by orekabe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-
-char	*ft_strjoin(char *s1, char *s2)
+char	*get_after_new_line(char *str)
 {
 	char	*ptr;
 	int		i;
 	int		j;
 
-	if (!s1)
-	{
-		s1 = (char *)malloc(sizeof(char));
-		*s1 = '\0';
-	}
-	if (!s2)
-		return (NULL);
 	i = 0;
 	j = 0;
-	ptr = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (!(ptr))
+	while (str[i] && str[i] != '\n')
+		i++;
+	if (!str[i])
+	{
+		free (str);
 		return (NULL);
-	while (s1[i])
-	{
-		ptr[i] = s1[i];
-		i++;
 	}
-	while (s2[j])
-	{
-		ptr[i] = s2[j];
-		j++;
-		i++;
-	}
-	ptr[i] = '\0';
-	free (s1);
+	ptr = (char *)malloc(sizeof(char) * (ft_strlen(str) - i) + 1);
+	if (!ptr)
+		return (NULL);
+	while (str[++i])
+		ptr[j++] = str[i];
+	ptr[j] = '\0';
+	free (str);
 	return (ptr);
 }
 
-char	*ft_strchr(char *s, int c)
-{
-	int		i;
-	char	ch;
-
-	if (!s)
-		return (NULL);
-	i = 0;
-	ch = (char)c;
-	if (c == 0)
-		return (s + ft_strlen(s));
-	while (s[i])
-	{
-		if (s[i] == ch)
-			return (s + i);
-		i++;
-	}
-	return (NULL);
-}
-
-char	*ft_read(char *ret, int fd)
+char	*get_line(char *str)
 {
 	char	*ptr;
-	int		rd;
+	int		i;
 
-	rd = 1;
-	ptr = malloc(BUFFER_SIZE + 1);
+	if (!*str)
+		return (NULL);
+	i = 0;
+	while (str[i] && str[i] != '\n')
+		i++;
+	ptr = (char *)malloc(sizeof(char) * i + 2);
 	if (!ptr)
 		return (NULL);
-	while (!ft_strchr(ret, '\n') && rd > 0)
+	i = 0;
+	while (str[i] && str[i] != '\n')
 	{
-		rd = read(fd, ptr, BUFFER_SIZE);
-		if (rd < 0)
-		{
-			free (ptr);
-			return (NULL);
-		}
-		ptr[rd] = '\0';
-		ret = ft_strjoin(ret, ptr);
+		ptr[i] = str[i];
+		i++;
 	}
-	free (ptr);
-	return (ret);
+	if (str[i] == '\n')
+	{
+		ptr[i] = str[i];
+		i++;
+	}
+	ptr[i] = '\0';
+	return (ptr);
 }
-char *get_next_line(int fd)
+
+char	*get_next_line(int fd)
 {
-	char static *str;
-	// char *ptr;
-	char *ret;
-	
-	ret = get_next_line(fd);
+	char static	*str;
+	char		*ret;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	str = ft_read(str, fd);
+	if (!str)
+		return (NULL);
+	ret = get_line(str);
+	str = get_after_new_line(str);
 	return (ret);
 }
 
-#include <fcntl.h>
-#include <stdio.h>
-int main()
-{
-	int fd = open("fd", O_CREAT | O_RDWR, 777);
-	char *ret = get_next_line(fd);
-	printf("%s", ret);
-}
+// #include <fcntl.h>
+// #include <stdio.h>
+// int main()
+// {
+// 	int fd = open("xD.txt", O_RDWR, 777);
+// 	char *ret = get_next_line(fd);
+// 	char *ret2 = get_next_line(fd);
+// 	char *ret3 = get_next_line(fd);
+// 	char *ret4 = get_next_line(fd);
+// 	printf("%s", ret);
+// 	printf("%s", ret2);
+// 	printf("%s", ret3);
+// 	printf("%s", ret4);
+// }
