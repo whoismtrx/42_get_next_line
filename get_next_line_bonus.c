@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: orekabe <orekabe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/29 15:00:58 by orekabe           #+#    #+#             */
-/*   Updated: 2022/01/02 22:58:16 by orekabe          ###   ########.fr       */
+/*   Created: 2022/01/02 23:00:14 by orekabe           #+#    #+#             */
+/*   Updated: 2022/01/02 23:02:16 by orekabe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*get_after_new_line(char *str)
 {
@@ -67,15 +67,15 @@ static char	*get_line(char *str)
 
 char	*get_next_line(int fd)
 {
-	char static	*str;
+	char static	*str[10240];
 	char		*ret;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	str = ft_read(str, fd);
-	if (!str)
+	str[fd] = ft_read(str[fd], fd);
+	if (!str[fd])
 		return (NULL);
-	ret = get_line(str);
-	str = get_after_new_line(str);
+	ret = get_line(str[fd]);
+	str[fd] = get_after_new_line(str[fd]);
 	return (ret);
 }
